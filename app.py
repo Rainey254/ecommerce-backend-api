@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from utils.db import test_db, users_collection
 from werkzeug.security import generate_password_hash, check_password_hash
 
-load_dotenv()
+
 
 app = Flask(__name__)
 
