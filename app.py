@@ -1,13 +1,72 @@
-from flask import Flask
+import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from dotenv import load_dotenv
+from utils.db import test_db, users_collection
+from werkzeug.security import generate_password_hash, check_password_hash
 
+load_dotenv()
 
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Test database connection
+test_db()
+
+#home route
 @app.route('/')
 def home():
-    return {"message": "Welcome to the E-commerce API"}
+    user = session.get('user')
+    return render_template('index.html', user=user)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        user = users_collection.find_one({'email': email})
+        if user and check_password_hash(user['password'], password):
+            session['user'] = {'name': user['name'], 'email': user['email']}
+            flash("Logged in successfully!", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Invalid email or password. Please try again.", "error")
+
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+
+
+        if users_collection.find_one({'email': email}):
+            flash("Email already in use. Please log in.", "error")
+            return redirect(url_for('register'))
+        
+        hashed_password = generate_password_hash(password)
+
+        users_collection.insert_one({
+            'name': name,
+            'email': email,
+            'password': hashed_password
+        })
+
+        flash("Registration success! Please log in.", "success")
+        return redirect(url_for('login'))
+    
+    return render_template('register.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash("Logged out successfully.", "success")
+    return redirect(url_for('home'))
+    
 
 if __name__ == "__main__":
-    print("Starting the flask app"
+    print("Starting the flask app")
     app.run(debug=True)
