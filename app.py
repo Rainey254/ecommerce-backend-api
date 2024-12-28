@@ -9,5 +9,5 @@ def home():
 
 
 if __name__ == "__main__":
-    print("Starting the flask app")
+    print("Starting the flask app"
     app.run(debug=True)
