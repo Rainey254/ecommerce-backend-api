@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from dotenv import load_dotenv
 from utils.db import test_db, users_collection
+from utils.auth import check_role
 from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
@@ -27,7 +28,7 @@ def login():
 
         user = users_collection.find_one({'email': email})
         if user and check_password_hash(user['password'], password):
-            session['user'] = {'name': user['name'], 'email': user['email']}
+            session['user'] = {'name': user['name'], 'email': user['email'], 'role': user['role']}
             flash("Logged in successfully!", "success")
             return redirect(url_for('home'))
         else:
@@ -45,14 +46,17 @@ def register():
 
         if users_collection.find_one({'email': email}):
             flash("Email already in use. Please log in.", "error")
-            return redirect(url_for('register'))
+            return redirect(url_for('login'))
         
         hashed_password = generate_password_hash(password)
+
+        role = 'user'
 
         users_collection.insert_one({
             'name': name,
             'email': email,
-            'password': hashed_password
+            'password': hashed_password,
+            'role': role
         })
 
         flash("Registration success! Please log in.", "success")
@@ -65,7 +69,28 @@ def logout():
     session.pop('user', None)
     flash("Logged out successfully.", "success")
     return redirect(url_for('home'))
+
+@app.route('/admin')
+def admin():
+    user = session.get('user')
+    if not user:
+        flash("You need to log in first.", "error")
+        return redirect(url_for('login'))
     
+    if not check_role(user, 'admin'):
+        flash("You do not have permission to access this page.", "error")
+        return redirect(url_for('home'))
+    
+    return render_template('admin.html')
+
+@app.route('/profile')
+def profile():
+    user = session.get('user')
+    if not user:
+        flash("You need to log in first.", "error")
+        return redirect(url_for('login'))
+    
+    return render_template('profile.html', user=user)
 
 if __name__ == "__main__":
     print("Starting the flask app")

@@ -12,8 +12,13 @@
     <nav>
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/register">Register</a></li>
+        {% if user %}
+          <li><a href="/profile">Profile</a></li>
+          <li><a href="/logout">Logout</a></li>
+        {% else %}
+          <li><a href="/login">Login</a></li>
+          <li><a href="/register">Register</a></li>
+        {% endif %}
       </ul>
     </nav>
   </header>
@@ -31,7 +36,5 @@
   <footer>
     <p>&copy; 2024 E-commerce App | All rights reserved.</p>
   </footer>
-  
-  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
