@@ -4,12 +4,17 @@ from dotenv import load_dotenv
 from utils.db import test_db, users_collection
 from utils.auth import check_role
 from werkzeug.security import generate_password_hash, check_password_hash
+from routes.products import products_bp
+from routes.orders import orders_bp
 
 load_dotenv()
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+app.register_blueprint(products_bp)
+app.register_blueprint(orders_bp)
 
 # Test database connection
 test_db()
