@@ -16,8 +16,6 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.register_blueprint(products_bp)
 app.register_blueprint(orders_bp)
 
-# Test database connection
-test_db()
 
 #home route
 @app.route('/')

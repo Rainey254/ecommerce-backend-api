@@ -20,18 +20,15 @@
   <main>
     {% if user %}
       <h2>Welcome, Admin {{ user.name }}</h2>
-      <p>Manage users and products here.</p>
-      <div>
-        <h3>Users:</h3>
-        <ul>
-          {% for user_item in users %}
-            <li>{{ user_item['name'] }} ({{ user_item['email'] }})</li>
-          {% endfor %}
-        </ul>
-      </div>
+      <p>Manage users and products here:</p>
+      <h3>User List</h3>
+      <ul>
+        {% for user_item in users %}
+          <li>{{ user_item['name'] }} - {{ user_item['email'] }}</li>
+        {% endfor %}
+      </ul>
     {% else %}
-      <p>You need to log in to access the admin dashboard.</p>
-      <a href="{{ url_for('login') }}">Login</a>
+      <p>Please <a href="{{ url_for('login') }}">log in</a> to access the admin dashboard.</p>
     {% endif %}
   </main>
   
