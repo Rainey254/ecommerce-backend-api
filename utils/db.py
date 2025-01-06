@@ -14,7 +14,11 @@ db = client["ecommerce"]
 users_collection = db["users"]
 products_collection = db["products"]
 orders_collection = db["orders"]
-
+notifications_collection = db["notifications"]
+reviews_collection = db["reviews"]
+categories_collection = db["categories"]
+audit_logs_collection = db["auditlogs"]
+wishlists_collection = db["wishlists"]
 
 #testing the connection
 def test_db():
