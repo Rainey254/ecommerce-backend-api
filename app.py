@@ -6,6 +6,12 @@ from utils.auth import check_role
 from werkzeug.security import generate_password_hash, check_password_hash
 from routes.products import products_bp
 from routes.orders import orders_bp
+from routes.notifications import notifications_bp
+from routes.audit_logs import audit_logs_bp
+from routes.categories import categories_bp
+from routes.reviews import reviews_bp
+from routes.wishlists import wishlists_bp
+
 
 load_dotenv()
 
@@ -15,6 +21,11 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 app.register_blueprint(products_bp)
 app.register_blueprint(orders_bp)
+app.register_blueprint(notifications_bp)
+app.register_blueprint(audit_logs_bp)
+app.register_blueprint(categories_bp)
+app.register_blueprint(reviews_bp)
+app.register_blueprint(wishlists_bp)
 
 
 #home route
