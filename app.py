@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from dotenv import load_dotenv
 from utils.db import test_db, users_collection
-from utils.auth import check_role
+from utils.auth import generate_jwt, verify_jwt, check_role, get_token_from_request
 from werkzeug.security import generate_password_hash, check_password_hash
 from routes.products import products_bp
 from routes.orders import orders_bp
@@ -11,6 +11,7 @@ from routes.audit_logs import audit_logs_bp
 from routes.categories import categories_bp
 from routes.reviews import reviews_bp
 from routes.wishlists import wishlists_bp
+from jwt import exceptions
 
 
 load_dotenv()
@@ -34,38 +35,23 @@ def home():
     user = session.get('user')
     return render_template('index.html', user=user)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-
-        user = users_collection.find_one({'email': email})
-        if user and check_password_hash(user['password'], password):
-            session['user'] = {'name': user['name'], 'email': user['email'], 'role': user['role']}
-            flash("Logged in successfully!", "success")
-            return redirect(url_for('home'))
-        else:
-            flash("Invalid email or password. Please try again.", "error")
-
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST'])
 def register():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
 
-
+        # Check if user already exists
         if users_collection.find_one({'email': email}):
-            flash("Email already in use. Please log in.", "error")
-            return redirect(url_for('login'))
+            return {"error": "Email already in use. Please log in."}, 409
         
         hashed_password = generate_password_hash(password)
 
+        # Default role for new users
         role = 'user'
 
+        # Save the user in the database
         users_collection.insert_one({
             'name': name,
             'email': email,
@@ -73,10 +59,46 @@ def register():
             'role': role
         })
 
-        flash("Registration success! Please log in.", "success")
-        return redirect(url_for('login'))
-    
-    return render_template('register.html')
+        return {"message": "Registration successful! Please log in."}, 201
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        # Find user in the database
+        user = users_collection.find_one({'email': email})
+        if user and check_password_hash(user['password'], password):
+            # Generate JWT
+            payload = {
+                "name": user['name'],
+                "email": user['email'],
+                "role": user['role']
+            }
+            token = generate_jwt(payload)
+            return {"message": "Logged in successfully!", "token": token}, 200
+        else:
+            return {"error": "Invalid email or password."}, 401
+
+
+@app.route('/admin', methods=['GET'])
+def admin():
+    try:
+        # Extract and verify the JWT
+        token = get_token_from_request()
+        if not check_role(token, 'admin'):
+            return {"error": "You do not have permission to access this page."}, 403
+
+        return {"message": "Welcome to the admin page!"}, 200
+    except ValueError as e:
+        return {"error": str(e)}, 401
+    except exceptions.ExpiredSignatureError:
+        return {"error": "Token has expired"}, 401
+    except exceptions.InvalidTokenError:
+        return {"error": "Invalid token"}, 401
+
 
 @app.route('/logout')
 def logout():
@@ -84,18 +106,6 @@ def logout():
     flash("Logged out successfully.", "success")
     return redirect(url_for('home'))
 
-@app.route('/admin')
-def admin():
-    user = session.get('user')
-    if not user:
-        flash("You need to log in first.", "error")
-        return redirect(url_for('login'))
-    
-    if not check_role(user, 'admin'):
-        flash("You do not have permission to access this page.", "error")
-        return redirect(url_for('home'))
-    
-    return render_template('admin.html')
 
 @app.route('/profile')
 def profile():
