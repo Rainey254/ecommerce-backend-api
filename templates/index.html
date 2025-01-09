@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-commerce</title>
+  <title>E-commerce Frontend</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
   <header>
@@ -14,6 +15,9 @@
         <li><a href="/">Home</a></li>
         {% if user %}
           <li><a href="/profile">Profile</a></li>
+          {% if user.role == 'admin' %}
+            <li><a href="/admin">Admin Dashboard</a></li>
+          {% endif %}
           <li><a href="/logout">Logout</a></li>
         {% else %}
           <li><a href="/login">Login</a></li>
@@ -22,19 +26,21 @@
       </ul>
     </nav>
   </header>
-  
+
   <main>
     <section id="featured-products">
       <h2>Featured Products</h2>
       <div class="product-list">
         <p>Explore our bestsellers:</p>
-        <!-- Dynamic product grid goes here -->
+        <div id="products-container">
+          <!-- Dynamic product grid populated by JavaScript -->
+        </div>
       </div>
     </section>
   </main>
-  
+
   <footer>
-    <p>&copy; 2024 E-commerce App | All rights reserved.</p>
+    <p>&copy; 2025 E-commerce App | All rights reserved.</p>
   </footer>
 </body>
 </html>

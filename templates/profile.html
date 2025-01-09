@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Profile</title>
+  <title>User Profile</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
   <header>
@@ -22,13 +23,48 @@
       <h2>Welcome, {{ user.name }}</h2>
       <p><strong>Email:</strong> {{ user.email }}</p>
       <p><strong>Role:</strong> {{ user.role }}</p>
+
+      <section id="wishlist">
+        <h3>Your Wishlist</h3>
+        {% if wishlist and wishlist|length > 0 %}
+          <ul>
+            {% for item in wishlist %}
+              <li>
+                <p><strong>{{ item.product_name }}</strong></p>
+                <p>Price: {{ item.price }}</p>
+                <button class="remove-wishlist" data-product-id="{{ item.product_id }}">Remove</button>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>Your wishlist is empty.</p>
+        {% endif %}
+      </section>
+
+      <section id="order-history">
+        <h3>Order History</h3>
+        {% if orders and orders|length > 0 %}
+          <ul>
+            {% for order in orders %}
+              <li>
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Date:</strong> {{ order.date }}</p>
+                <p><strong>Total:</strong> {{ order.total }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>You have no order history.</p>
+        {% endif %}
+      </section>
+
     {% else %}
       <p>Please <a href="{{ url_for('login') }}">log in</a> to view your profile.</p>
     {% endif %}
   </main>
-  
+
   <footer>
-    <p>&copy; 2024 E-commerce App | All rights reserved.</p>
+    <p>&copy; 2025 E-commerce App | All rights reserved.</p>
   </footer>
 </body>
 </html>

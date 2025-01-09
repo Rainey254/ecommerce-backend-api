@@ -1,94 +1,161 @@
+/* General styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-}
-
-header {
-    background-color: #333;
-    color: #fff;
-    padding: 1rem;
+    box-sizing: border-box;
+  }
+  
+  header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
     text-align: center;
-}
-
-header nav ul {
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  nav ul {
     list-style: none;
     padding: 0;
-}
-
-header nav ul li {
-    display: inline;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+  }
+  
+  nav ul li {
     margin: 0 10px;
-}
-
-header nav ul li a {
-    color: #fff;
+  }
+  
+  nav ul li a {
+    color: white;
     text-decoration: none;
-}
-
-main {
+    font-weight: bold;
+  }
+  
+  nav ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  main {
     padding: 20px;
-}
-
-#featured-products {
-    margin-top: 20px;
-}
-
-.product-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-footer {
+    background-color: #f4f4f4;
+    min-height: 80vh;
+  }
+  
+  footer {
     background-color: #333;
-    color: #fff;
-    padding: 1rem;
+    color: white;
     text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-form {
+    padding: 10px 0;
+  }
+  
+  footer p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  
+  /* Form styles */
+  form {
     max-width: 400px;
     margin: 0 auto;
+    background: white;
     padding: 20px;
-    background-color: #fff;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-form label {
-    display: block;
-    margin-bottom: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  form label {
     font-weight: bold;
-}
-
-form input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-form button {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  form input,
+  form button {
     width: 100%;
     padding: 10px;
-    background-color: #333;
-    color: #fff;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  form button {
+    background-color: #4CAF50;
+    color: white;
     border: none;
-    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  form button:hover {
+    background-color: #45a049;
     cursor: pointer;
-}
-
-form button:hover {
-    background-color: #555;
-}
-
-footer p {
-    margin: 0;
+  }
+  
+  /* Error message */
+  .error-message {
+    color: red;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  /* Sections */
+  #featured-products .product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  #featured-products .product-list .product-item {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  #featured-products .product-list .product-item img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  #featured-products .product-list .product-item h3 {
+    margin: 10px 0;
+  }
+  
+  button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button.remove-wishlist {
+    background-color: #ff4d4d;
+    color: white;
+  }
+  
+  button.remove-wishlist:hover {
+    background-color: #ff3333;
+  }
+  
+  /* Wishlist and Orders */
+  #wishlist ul,
+  #order-history ul {
+    list-style: none;
     padding: 0;
-}
+  }
+  
+  #wishlist ul li,
+  #order-history ul li {
+    background: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }  

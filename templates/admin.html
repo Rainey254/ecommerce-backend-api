@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
   <header>
@@ -18,22 +19,48 @@
   </header>
 
   <main>
-    {% if user %}
+    {% if user and user.role == 'admin' %}
       <h2>Welcome, Admin {{ user.name }}</h2>
-      <p>Manage users and products here:</p>
-      <h3>User List</h3>
-      <ul>
-        {% for user_item in users %}
-          <li>{{ user_item['name'] }} - {{ user_item['email'] }}</li>
-        {% endfor %}
-      </ul>
+      <section>
+        <h3>Manage Users</h3>
+        <ul id="user-list">
+          {% for user_item in users %}
+            <li>{{ user_item.name }} ({{ user_item.email }})</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h3>Manage Products</h3>
+        <ul id="product-list">
+          {% for product in products %}
+            <li>{{ product.name }} - ${{ product.price }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>
+        <h3>Add New Product</h3>
+        <form id="add-product-form" method="POST" action="/admin/add_product">
+          <label for="product-name">Name:</label>
+          <input type="text" id="product-name" name="name" required>
+
+          <label for="product-price">Price:</label>
+          <input type="number" id="product-price" name="price" required>
+
+          <label for="product-description">Description:</label>
+          <textarea id="product-description" name="description" required></textarea>
+
+          <button type="submit">Add Product</button>
+        </form>
+      </section>
     {% else %}
-      <p>Please <a href="{{ url_for('login') }}">log in</a> to access the admin dashboard.</p>
+      <p>You do not have access to this page. Please <a href="{{ url_for('login') }}">log in</a>.</p>
     {% endif %}
   </main>
-  
+
   <footer>
-    <p>&copy; 2024 E-commerce App | All rights reserved.</p>
+    <p>&copy; 2025 E-commerce App | All rights reserved.</p>
   </footer>
 </body>
 </html>

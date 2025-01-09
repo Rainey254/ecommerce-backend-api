@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
   <header>
     <h1>Login</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/register">Register</a></li>
+      </ul>
+    </nav>
   </header>
   
   <main>
@@ -20,8 +27,13 @@
       <input type="password" id="password" name="password" placeholder="Your Password" required>
       
       <button type="submit">Login</button>
+      <p id="login-error" class="error-message">{{ error_message }}</p>
     </form>
-    <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
   </main>
+
+  <footer>
+    <p>&copy; 2025 E-commerce App | All rights reserved.</p>
+  </footer>
 </body>
 </html>
