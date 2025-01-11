@@ -7,20 +7,20 @@ class Product:
 
     def create(self, product_data):
         """insert a new product"""
-        return self.collection.insert_one(product_data)
+        return self.Collection.insert_one(product_data)
     
     def find_all(self):
         """Retrieve all products."""
-        return list(self.collection.find())
+        return list(self.Collection.find())
     
     def find_by_id(self, product_id):
         """Retrieve a product by id"""
-        return self.collection.find_one({"_id": ObjectId(product_id)})
+        return self.Collection.find_one({"_id": ObjectId(product_id)})
     
     def update(self, product_id, update_data):
         """Update a product by id."""
-        return self.collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
+        return self.Collection.update_one({"_id": ObjectId(product_id)}, {"$set": update_data})
     
     def delete(self, product_id):
         """Deletes a product by ID"""
-        return self.collection.delete_one({"_id": ObjectId(product_id)})
+        return self.Collection.delete_one({"_id": ObjectId(product_id)})

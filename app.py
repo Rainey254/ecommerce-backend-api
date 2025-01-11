@@ -68,7 +68,7 @@ def register():
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
-        password = request.form('password')
+        password = request.form.get('password')
 
         # Find user in the database
         user = users_collection.find_one({'email': email})
@@ -83,18 +83,26 @@ def login():
 @app.route('/admin', methods=['GET'])
 def admin():
     try:
-        # Extract and verify the JWT
+        # Extract the token from the request
         token = get_token_from_request()
-        if not check_role(token, 'admin'):
-            return {"error": "You do not have permission to access this page."}, 403
+        if not token:
+            return {"error": "Authorization token is missing."}, 400
 
+        # Verify the user's role
+        if not check_role(token, 'admin'):
+            return {"error": "Access denied. Admin privileges required."}, 403
+
+        # Successful access
         return {"message": "Welcome to the admin page!"}, 200
-    except ValueError as e:
-        return {"error": str(e)}, 401
+
     except exceptions.ExpiredSignatureError:
-        return {"error": "Token has expired"}, 401
+        return {"error": "The token has expired. Please log in again."}, 401
     except exceptions.InvalidTokenError:
-        return {"error": "Invalid token"}, 401
+        return {"error": "The token is invalid. Please log in again."}, 401
+    except ValueError as e:
+        return {"error": f"An error occurred: {str(e)}"}, 401
+    except Exception as e:
+        return {"error": f"Unexpected error: {str(e)}"}, 500
 
 
 @app.route('/logout')
@@ -112,6 +120,7 @@ def profile():
         return redirect(url_for('login'))
     
     return render_template('profile.html', user=user)
+
 
 if __name__ == "__main__":
     print("Starting the flask app")
