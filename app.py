@@ -38,9 +38,13 @@ def home():
 @app.route('/register', methods=['POST'])
 def register():
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        role = request.form.get('role', 'user')
+
+        if not name or not email or not password:
+            return({"error": "Name, email, and password are required."}), 400
 
         # Check if user already exists
         if users_collection.find_one({'email': email}):
@@ -48,8 +52,6 @@ def register():
         
         hashed_password = generate_password_hash(password)
 
-        # Default role for new users
-        role = 'user'
 
         # Save the user in the database
         users_collection.insert_one({
@@ -65,19 +67,14 @@ def register():
 @app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form('password')
 
         # Find user in the database
         user = users_collection.find_one({'email': email})
         if user and check_password_hash(user['password'], password):
             # Generate JWT
-            payload = {
-                "name": user['name'],
-                "email": user['email'],
-                "role": user['role']
-            }
-            token = generate_jwt(payload)
+            token = generate_jwt(user_id=str(user['_id']), role=user['role'])
             return {"message": "Logged in successfully!", "token": token}, 200
         else:
             return {"error": "Invalid email or password."}, 401

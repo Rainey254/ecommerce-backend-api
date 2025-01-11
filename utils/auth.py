@@ -8,17 +8,22 @@ from flask import request
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # Helper function to generate a JWT
-def generate_jwt(payload, expires_in=3600):
+def generate_jwt(user_id, role, expires_in=3600):
     """
-    Generates a JWT with the given payload and expiration time.
+    Generates a JWT with the given user_id and role.
     Args:
-        payload (dict): The payload to include in the token.
+        user_id (str): The unique identifier for the user.
+        role (str): The role of the user (e.g., 'admin' or 'user').
         expires_in (int): Expiration time in seconds (default: 1 hour).
     Returns:
         str: The encoded JWT.
     """
     expiration = datetime.utcnow() + timedelta(seconds=expires_in)
-    payload['exp'] = expiration  # Add expiration to the payload
+    payload = {
+        'user_id': user_id,
+        'role': role,
+        'exp': expiration  # Add expiration to the payload
+    }
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     return token
 
@@ -71,3 +76,22 @@ def get_token_from_request():
     if not auth_header or not auth_header.startswith("Bearer "):
         raise ValueError("Authorization token is missing or invalid")
     return auth_header.split(" ")[1]
+
+# Middleware for role-based access control
+def role_required(role):
+    """
+    Decorator to enforce role-based access control.
+    Args:
+        role (str): The required role (e.g., 'admin').
+    """
+    def decorator(f):
+        def wrapper(*args, **kwargs):
+            try:
+                token = get_token_from_request()
+                if not check_role(token, role):
+                    return {"error": "Access denied"}, 403
+            except ValueError as e:
+                return {"error": str(e)}, 401
+            return f(*args, **kwargs)
+        return wrapper
+    return decorator
