@@ -7,6 +7,7 @@ class Product:
 
     def create(self, product_data):
         """insert a new product"""
+        print("Creating product with data:", product_data)
         return self.Collection.insert_one(product_data)
     
     def find_all(self):

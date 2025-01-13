@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from utils.auth import check_role
+from utils.auth import check_role, get_token_from_request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.db import products_collection
 from models.product import Product
@@ -11,17 +11,23 @@ product_model = Product(products_collection)
 @products_bp.route('/products', methods=['POST'])
 @jwt_required()
 def create_product():
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
-        return jsonify({'error': 'Unauthorized access'}), 403
-    
-    data = request.get_json()
-    required_fields = ['name', 'description', 'price', 'stock', 'category']
-    if not all(field in data for field in required_fields):
-        return jsonify({'error': 'All fields are required'}), 400
-    
-    result = product_model.create(data)
-    return jsonify({'message': 'Product created', 'id': str(result.inserted_id)}), 201
+    try:
+        token = get_token_from_request()
+        if not check_role(token, 'admin'):
+            return jsonify({'error': 'Unauthorized access'}), 403
+        
+        data = request.get_json()
+        required_fields = ['name', 'description', 'price', 'stock', 'category']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'All fields are required'}), 400
+        
+        result = product_model.create(data)
+        return jsonify({'message': 'Product created', 'id': str(result.inserted_id)}), 201
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 401
+    except Exception as e:
+        print(f"Error creating product: {e}")
+        return jsonify({'error': 'An internal server error occured'})
 
 # Get all products
 @products_bp.route('/products', methods=['GET'])

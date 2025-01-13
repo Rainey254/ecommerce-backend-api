@@ -1,6 +1,6 @@
 import jwt
 from jwt import exceptions
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 from flask import request
 
@@ -18,9 +18,9 @@ def generate_jwt(user_id, role, expires_in=3600):
     Returns:
         str: The encoded JWT.
     """
-    expiration = datetime.utcnow() + timedelta(seconds=expires_in)
+    expiration = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
     payload = {
-        'user_id': user_id,
+        'sub': user_id,
         'role': role,
         'exp': expiration  # Add expiration to the payload
     }

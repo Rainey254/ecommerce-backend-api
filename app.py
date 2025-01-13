@@ -12,13 +12,22 @@ from routes.categories import categories_bp
 from routes.reviews import reviews_bp
 from routes.wishlists import wishlists_bp
 from jwt import exceptions
+from flask_jwt_extended import JWTManager
 
 
 load_dotenv()
 
 app = Flask(__name__)
 
+jwt = JWTManager(app)
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['JWT_TOKEN_LOCATION'] = ['headers']
+app.config['JWT_HEADER_NAME'] = 'Authorization'
+app.config['JWT_HEADER_TYPE'] = 'Bearer'
+
+
 
 app.register_blueprint(products_bp)
 app.register_blueprint(orders_bp)
