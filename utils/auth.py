@@ -59,6 +59,7 @@ def check_role(token, role_required):
     """
     try:
         payload = verify_jwt(token)
+        print(f"Decoded token payload: {payload}")
         return payload.get('role') == role_required
     except (exceptions.ExpiredSignatureError, exceptions.InvalidTokenError):
         return False

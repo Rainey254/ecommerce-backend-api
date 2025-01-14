@@ -1,5 +1,5 @@
 import os
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 from dotenv import load_dotenv
 
 
@@ -19,6 +19,8 @@ reviews_collection = db["reviews"]
 categories_collection = db["categories"]
 audit_logs_collection = db["auditlogs"]
 wishlists_collection = db["wishlists"]
+
+categories_collection.create_index([("name", ASCENDING)], unique=True)
 
 #testing the connection
 def test_db():

@@ -51,8 +51,8 @@ def get_product(product_id):
 @products_bp.route('/products/<product_id>', methods=['PUT'])
 @jwt_required()
 def update_product(product_id):
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
+    token = get_token_from_request()
+    if not check_role(token, 'admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
     
     data = request.get_json()
@@ -66,8 +66,8 @@ def update_product(product_id):
 @products_bp.route('/products/<product_id>', methods=['DELETE'])
 @jwt_required()
 def delete_product(product_id):
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
+    token = get_token_from_request()
+    if not check_role(token, 'admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
     
     result = product_model.delete(product_id)
