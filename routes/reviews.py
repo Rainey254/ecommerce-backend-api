@@ -17,12 +17,13 @@ def add_review():
     if not all(field in data for field in required_fields):
         return jsonify({'error': 'All fields are required'}), 400
 
-    data['user_id'] = user['_id']
+    data['user_id'] = user
     result = review_model.add_review(data)
     return jsonify({'message': 'Review added', 'id': str(result.inserted_id)}), 201
 
 # Get reviews by product
 @reviews_bp.route('/reviews/product/<product_id>', methods=['GET'])
+@jwt_required()
 def get_reviews_by_product(product_id):
     reviews = review_model.find_reviews_by_product(product_id)
     for review in reviews:
@@ -34,7 +35,7 @@ def get_reviews_by_product(product_id):
 @jwt_required()
 def get_reviews_by_user():
     user = get_jwt_identity()
-    reviews = review_model.find_reviews_by_user(user['_id'])
+    reviews = review_model.find_reviews_by_user(user)
     for review in reviews:
         review['_id'] = str(review['_id'])
     return jsonify(reviews), 200

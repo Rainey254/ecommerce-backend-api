@@ -83,8 +83,9 @@ def login():
         user = users_collection.find_one({'email': email})
         if user and check_password_hash(user['password'], password):
             # Generate JWT
-            token = generate_jwt(user_id=str(user['_id']), role=user['role'])
-            return {"message": "Logged in successfully!", "token": token}, 200
+            user_id = str(user['_id'])
+            token = generate_jwt(user_id=user_id, role=user['role'])
+            return {"message": "Logged in successfully!", "user_id": user_id, "token": token}, 200
         else:
             return {"error": "Invalid email or password."}, 401
 

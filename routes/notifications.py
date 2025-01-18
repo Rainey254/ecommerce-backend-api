@@ -23,7 +23,7 @@ def create_notification():
 @jwt_required()
 def get_user_notifications():
     user = get_jwt_identity()
-    notifications = notification_model.find_all_notifications(user['_id'])
+    notifications = notification_model.find_all_notifications(user)
     for notification in notifications:
         notification['_id'] = str(notification['_id'])
     return jsonify(notifications), 200

@@ -49,11 +49,22 @@ def get_all_orders():
 @orders_bp.route('/orders/user', methods=['GET'])
 @jwt_required()
 def get_user_orders():
-    user = get_jwt_identity()
-    orders = order_model.find_all_orders(user_id=user['_id'])
-    for order in orders:
-        order['_id'] = str(order['_id'])
-    return jsonify(orders), 200
+    try:
+        user = get_jwt_identity()
+        print("JWT Identity:", user)
+
+        user_id = user
+        print("Fetching orders for User ID:", user_id)
+
+        orders = order_model.find_all_orders(user_id=user)
+        for order in orders:
+            if '_id' in order:
+                order['_id'] = str(order['_id'])
+        return jsonify(orders), 200
+    except Exception as e:
+         print("Error in get_user_orders:", str(e))
+         return jsonify({'error': str(e)}), 500
+
 
 # Update an order's status (Admin only)
 @orders_bp.route('/orders/<order_id>', methods=['PUT'])
