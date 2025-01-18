@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from bson.objectid import ObjectId
-from utils.auth import check_role
+from utils.auth import check_role, get_token_from_request
 from utils.db import orders_collection
 from models.order import Order
+from models.user import UserModel
 
 orders_bp = Blueprint('orders', __name__)
 order_model = Order(orders_collection)
@@ -12,24 +13,30 @@ order_model = Order(orders_collection)
 @orders_bp.route('/orders', methods=['POST'])
 @jwt_required()
 def place_order():
-    user = get_jwt_identity()
-    data = request.get_json()
+    try:
+        user = get_jwt_identity()
+        if isinstance(user, str):
+            user = UserModel.get_user_by_id(user)
+        data = request.get_json()
 
-    required_fields = ['product_id', 'quantity', 'total_price']
-    if not all(field in data for field in required_fields):
-        return jsonify({'error': 'All fields are required'}), 400
+        required_fields = ['product_id', 'quantity', 'total_price']
+        if not all(field in data for field in required_fields):
+            return jsonify({'error': 'All fields are required'}), 400
 
-    # Add user-specific data
-    data['user_id'] = user['_id']
-    result = order_model.create_order(data)
-    return jsonify({'message': 'Order placed successfully', 'order_id': str(result.inserted_id)}), 201
+        # Add user-specific data
+        data['user_id'] = user['_id']
+        result = order_model.create_order(data)
+        return jsonify({'message': 'Order placed successfully', 'order_id': str(result.inserted_id)}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
 
 # Retrieve all orders (Admin only)
 @orders_bp.route('/orders', methods=['GET'])
 @jwt_required()
 def get_all_orders():
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
+    token = get_token_from_request()
+    if not check_role(token, 'admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
 
     orders = order_model.find_all_orders()
@@ -52,8 +59,8 @@ def get_user_orders():
 @orders_bp.route('/orders/<order_id>', methods=['PUT'])
 @jwt_required()
 def update_order_status(order_id):
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
+    token = get_token_from_request()
+    if not check_role(token, 'admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
 
     data = request.get_json()
@@ -70,8 +77,8 @@ def update_order_status(order_id):
 @orders_bp.route('/orders/<order_id>', methods=['DELETE'])
 @jwt_required()
 def delete_order(order_id):
-    user = get_jwt_identity()
-    if not check_role(user, 'admin'):
+    token = get_token_from_request()
+    if not check_role(token, 'admin'):
         return jsonify({'error': 'Unauthorized access'}), 403
 
     result = order_model.delete_order(order_id)
